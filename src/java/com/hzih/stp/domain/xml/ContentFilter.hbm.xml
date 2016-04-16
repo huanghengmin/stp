@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="contentfilter" name="com.hzih.stp.domain.ContentFilter">
+    <id access="field" name="id" type="java.lang.Long" column="Id">
+      <generator class="identity"/>
+    </id>
+    <property name="filter" column="filter" access="field" type="java.lang.String"/>
+  </class>
+</hibernate-mapping>

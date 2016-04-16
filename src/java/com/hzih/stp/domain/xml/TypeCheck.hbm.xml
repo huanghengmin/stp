@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="type_check" name="com.hzih.stp.domain.TypeCheck">
+    <id access="field" name="id" type="java.lang.Long" column="id" length="11">
+      <generator class="increment"/>
+    </id>
+    <property name="appName" length="100" column="appName" access="field" type="java.lang.String"/>
+    <property name="appType" length="10" column="appType" access="field" type="java.lang.String"/>
+    <property name="up" length="4" column="up" access="field" type="java.lang.Integer"/>
+    <property name="desc" length="500" column="description" access="field" type="java.lang.String"/>
+    <property name="reDesc" length="500" column="redescription" access="field" type="java.lang.String"/>
+  </class>
+</hibernate-mapping>

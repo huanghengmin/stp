@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="securitylevel" name="com.hzih.stp.domain.SecurityLevel">
+    <id access="field" name="id" type="long" column="id" length="11">
+      <generator class="increment"/>
+    </id>
+    <property name="levelInfo" column="level_info" access="field" type="string"/>
+    <property name="securityFlag" column="security_flag" access="field" type="string"/>
+    <property name="securityLevel" column="security_level" access="field" type="int"/>
+  </class>
+</hibernate-mapping>

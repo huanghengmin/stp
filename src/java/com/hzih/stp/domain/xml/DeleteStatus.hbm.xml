@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="delete_status" name="com.hzih.stp.domain.DeleteStatus">
+    <id access="field" name="id" type="java.lang.Long" column="id">
+      <generator class="increment"/>
+    </id>
+    <property name="appName" column="appName" access="field" type="java.lang.String"/>
+    <property name="plugin" column="plugin" access="field" type="java.lang.String"/>
+  </class>
+</hibernate-mapping>

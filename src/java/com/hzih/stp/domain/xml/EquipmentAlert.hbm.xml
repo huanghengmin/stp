@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="equipment_alert" name="com.hzih.stp.domain.EquipmentAlert">
+    <id access="field" name="id" type="java.lang.Long" column="id">
+      <generator class="increment"/>
+    </id>
+    <property name="equipmentName" column="equipment_name" access="field" type="java.lang.String"/>
+    <property name="cpu" column="cpu" access="field" type="java.lang.Integer"/>
+    <property name="memory" column="memory" access="field" type="java.lang.Integer"/>
+    <property name="disk" column="disk" access="field" type="java.lang.Integer"/>
+  </class>
+</hibernate-mapping>

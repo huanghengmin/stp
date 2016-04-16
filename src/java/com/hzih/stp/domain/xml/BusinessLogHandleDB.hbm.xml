@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="business_log_handle_db" name="com.hzih.stp.domain.BusinessLogHandleDB">
+    <id access="field" name="id" column="id" type="java.lang.Long">
+      <generator class="increment"/>
+    </id>
+    <property name="appName" column="appName" access="field" type="java.lang.String"/>
+    <property name="fileName" column="fileName" access="field" type="java.lang.String"/>
+    <property name="operate" column="operate" access="field" type="java.lang.String"/>
+    <property name="logTime" column="logTime" access="field" type="java.lang.Long"/>
+    <property name="flag" column="flag" access="field" type="java.lang.Integer"/>
+  </class>
+</hibernate-mapping>

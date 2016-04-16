@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/aop 
+                           http://www.springframework.org/schema/aop/spring-aop-2.0.xsd 
+                           http://www.springframework.org/schema/tx 
+                           http://www.springframework.org/schema/tx/spring-tx-2.0.xsd ">
+    <!-- load properties from file -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:/config.properties</value>
+		</property>
+	</bean>
+
+	<!-- ///////////////// 数据库持久层配置 /////////////////// -->
+	<!--<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">-->
+		<!--<property name="jndiName" value="java:comp/env/${jndiName}"></property>-->
+	<!--</bean>-->
+    <bean id="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClass}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.user}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.password}</value>
+		</property>
+		<!--连接池中保留的最小连接数。-->
+		<property name="minPoolSize" value="10" />
+		<!--连接池中保留的最大连接数。Default: 15 -->
+		<property name="maxPoolSize" value="30" />
+		<!--最大空闲时间,1800秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
+		<property name="maxIdleTime" value="1800" />
+		<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+		<property name="acquireIncrement" value="3" />
+		<property name="maxStatements" value="0" />
+		<property name="initialPoolSize" value="3" />
+		<!--每60秒检查所有连接池中的空闲连接。Default: 0 -->
+		<property name="idleConnectionTestPeriod" value="60" />
+		<!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 -->
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="100" />
+		<property name="breakAfterAcquireFailure" value="true" />
+		<property name="testConnectionOnCheckout" value="false" />
+	</bean>
+    <!--Hibernate SessionFatory-->
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+        <property name="configLocations">
+            <list>
+                <value>classpath:hibernate.cfg.xml</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.connection.release_mode">auto</prop>
+                <prop key="hibernate.autoReconnect">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="cache.use_query_cache">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--Hibernate TransactionManager--><!-- 事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref local="sessionFactory" />
+        </property>
+    </bean>
+    <!--   配置事务拦截器-->
+    <bean id="transactionalTemplate" abstract="true" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="new*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="bind*">PROPAGATION_REQUIRED</prop>
+				<prop key="cancel*">PROPAGATION_REQUIRED</prop>
+				<prop key="change*">PROPAGATION_REQUIRED</prop>
+				<prop key="check*">PROPAGATION_REQUIRED</prop>
+				<prop key="del*">PROPAGATION_REQUIRED</prop>
+				<prop key="edit*">PROPAGATION_REQUIRED</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="insert">PROPAGATION_REQUIRED</prop>
+				<prop key="list*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="merge*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="next*">PROPAGATION_REQUIRED</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED</prop>
+				<prop key="upd*">PROPAGATION_REQUIRED</prop>
+				<prop key="unbind*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="build*">PROPAGATION_REQUIRED</prop>
+				<prop key="search*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+    <bean id="autoBeanNameProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames">
+            <list>
+                <value>*DAO</value>
+                <value>gotoPage</value>
+                <value>find</value>
+            </list>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="transactionalTemplate" />
+            </list>
+        </property>
+
+        <!-- 这里的配置是必须的，否则无法完成代理的类型转化 这是使用CGLIB来生成代理 -->
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+
+	<!--dao-->
+	<bean id="daoTemplate" abstract="true" class="cn.collin.commons.dao.MyDaoSupport">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <!--<bean id="xmlOperatorDAO" class="com.hzih.stp.dao.impl.XmlOperatorDAOImpl"/>-->
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.AccountDaoImpl" id="accountDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.AuditResetDaoImpl" id="auditResetDao"/>
+	<bean parent="daoTemplate" class="com.hzih.stp.dao.impl.BusinessLogDaoImpl" id="businessLogDao"/>
+	<bean parent="daoTemplate" class="com.hzih.stp.dao.impl.BusinessLogHandleDBDaoImpl" id="businessLogHandleDBDao"/>
+	<bean parent="daoTemplate" class="com.hzih.stp.dao.impl.BusinessLogTimeDaoImpl" id="businessLogTimeDao"/>
+	<bean parent="daoTemplate" class="com.hzih.stp.dao.impl.BusinessSecurityAlertDaoImpl" id="businessSecurityAlertDao"/>
+	<bean parent="daoTemplate" class="com.hzih.stp.dao.impl.BusinessSecurityAlertTypeDaoImpl" id="businessSecurityAlertTypeDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.ContentFilterDaoImpl" id="contentFilterDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.DeleteStatusDaoImpl" id="deleteStatusDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.DepartmentDaoImpl" id="departmentDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.EquipmentLogDaoImpl" id="equipmentLogDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.EquipmentDaoImpl" id="equipmentDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.EquipmentAlertDaoImpl" id="equipmentAlertDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.EquipmentSecurityAlertDaoImpl" id="equipmentSecurityAlertDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.EquipmentTypeDaoImpl" id="equipmentTypeDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.PermissionDaoImpl" id="permissionDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.RoleDaoImpl" id="roleDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.RoleTypeDaoImpl" id="roleTypeDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.SafeEventSecurityAlertDaoImpl" id="safeEventSecurityAlertDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.SafeEventSecurityAlertTypeDaoImpl" id="safeEventSecurityAlertTypeDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.SafePolicyDaoImpl" id="safePolicyDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.SysLogDaoImpl" id="sysLogDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.SecurityLevelDaoImpl" id="securityLevelDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.TypeCheckDaoImpl" id="typeCheckDao"/>
+    <bean parent="daoTemplate" class="com.hzih.stp.dao.impl.UserOperLogDaoImpl" id="userOperLogDao"/>
+
+    <!-- services -->
+    <bean class="com.hzih.stp.service.impl.XmlOperatorServiceImpl" id="xmlOperatorService">
+        <property name="deleteStatusDao" ref="deleteStatusDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.DataBaseServiceImpl" id="dataBaseService"/>
+    <bean class="com.hzih.stp.service.impl.LogServiceImpl" id="logService">
+        <property name="sysLogDao" ref="sysLogDao" />
+        <property name="userOperLogDao" ref="userOperLogDao" />
+        <property name="businessLogDao" ref="businessLogDao" />
+        <property name="equipmentLogDao" ref="equipmentLogDao" />
+    </bean>
+    <bean class="com.hzih.stp.service.impl.LoginServiceImpl" id="loginService">
+        <property name="accountDao" ref="accountDao" />
+    </bean>
+    <bean class="com.hzih.stp.service.impl.SafePolicyServiceImpl" id="safePolicyService">
+        <property name="safePolicyDao" ref="safePolicyDao" />
+    </bean>
+    <bean class="com.hzih.stp.service.impl.RoleServiceImpl" id="roleService">
+        <property name="roleDao" ref="roleDao" />
+        <property name="roleTypeDao" ref="roleTypeDao" />
+        <property name="permissionDao" ref="permissionDao" />
+    </bean>
+    <bean class="com.hzih.stp.service.impl.AccountServiceImpl" id="accountService">
+        <property name="accountDao" ref="accountDao"/>
+        <property name="roleDao" ref="roleDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.AuditResetServiceImpl" id="auditResetService">
+        <property name="auditResetDao" ref="auditResetDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.AuditServiceImpl" id="auditService">
+        <property name="businessLogDao" ref="businessLogDao"/>
+        <property name="sysLogDao" ref="sysLogDao"/>
+        <property name="userOperLogDao" ref="userOperLogDao"/>
+        <property name="equipmentLogDao" ref="equipmentLogDao"/>
+        <property name="equipmentDao" ref="equipmentDao"/>
+        <property name="businessLogHandleDBDao" ref="businessLogHandleDBDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.EquipmentAlertServiceImpl" id="equipmentAlertService">
+        <property name="equipmentAlertDao" ref="equipmentAlertDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.EquipmentServiceImpl" id="equipmentService">
+        <property name="equipmentDao" ref="equipmentDao"/>
+        <property name="equipmentAlertDao" ref="equipmentAlertDao"/>
+        <property name="equipmentTypeDao" ref="equipmentTypeDao"/>
+        <property name="departmentDao" ref="departmentDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.ContentFilterServiceImpl" id="contentFilterService">
+        <property name="contentFilterDao" ref="contentFilterDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.TypeCheckServiceImpl" id="typeCheckService">
+        <property name="typeCheckDao" ref="typeCheckDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.DeleteStatusServiceImpl" id="deleteStatusService">
+        <property name="deleteStatusDao" ref="deleteStatusDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.SecurityLevelServiceImpl" id="securityLevelService">
+        <property name="securityLevelDao" ref="securityLevelDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.MonitorServiceImpl" id="monitorService">
+        <property name="equipmentDao" ref="equipmentDao"/>
+        <property name="equipmentTypeDao" ref="equipmentTypeDao"/>
+        <property name="departmentDao" ref="departmentDao"/>
+        <property name="businessLogTimeDao" ref="businessLogTimeDao"/>
+    </bean>
+    <bean class="com.hzih.stp.service.impl.SecurityServiceImpl" id="securityService">
+        <property name="businessSecurityAlertDao" ref="businessSecurityAlertDao"/>
+        <property name="businessSecurityAlertTypeDao" ref="businessSecurityAlertTypeDao"/>
+        <property name="equipmentDao" ref="equipmentDao"/>
+        <property name="equipmentSecurityAlertDao" ref="equipmentSecurityAlertDao"/>
+        <property name="safeEventSecurityAlertDao" ref="safeEventSecurityAlertDao"/>
+        <property name="safeEventSecurityAlertTypeDao" ref="safeEventSecurityAlertTypeDao"/>
+    </bean>
+
+    <!-- action  -->
+    <bean class="com.hzih.stp.web.action.CheckTimeoutAction" id="checkTimeoutAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.user.LoginAction" id="loginAction">
+        <property name="loginService" ref="loginService" />
+        <property name="logService" ref="logService" />
+        <property name="securityService" ref="securityService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.user.LogoutAction" id="logoutAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.user.RoleAction" id="RoleAction">
+        <property name="roleService" ref="roleService"/>
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.user.SafePolicyAction" id="SafePolicyAction">
+        <property name="logService" ref="logService" />
+        <property name="safePolicyService" ref="safePolicyService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.user.AccountAction" id="AccountAction">
+        <property name="logService" ref="logService" />
+        <property name="accountService" ref="accountService"/>
+        <property name="safePolicyService" ref="safePolicyService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.net.InterfaceManagerAction" id="InterfaceManagerAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.net.SecurityConfigAction" id="SecurityConfigAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.PlatformConfigAction" id="PlatformConfigAction">
+        <property name="logService" ref="logService" />
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.PlatformAction" id="PlatformAction">
+        <property name="logService" ref="logService" />
+        <property name="dataBaseService" ref="dataBaseService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.LicenseAction" id="LicenseAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.ManagerLogAction" id="ManagerLogAction">
+        <property name="logService" ref="logService" />
+        <property name="loginService" ref="loginService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.UpgradeAction" id="UpgradeAction">
+        <property name="logService" ref="logService" />
+        <property name="dataBaseService" ref="dataBaseService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.ManagerConfigAction" id="ManagerConfigAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.ManagerConfigFileAction" id="ManagerConfigFileAction">
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.system.InitAction" id="InitAction">
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.EquipmentAction" id="EquipmentAction">
+        <property name="logService" ref="logService" />
+        <property name="equipmentService" ref="equipmentService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.LinkAction" id="LinkAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.ManagerDataBaseAction" id="ManagerDataBaseAction">
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.ManagerSecurityLevelAction" id="ManagerSecurityLevelAction">
+        <property name="logService" ref="logService"/>
+        <property name="securityLevelService" ref="securityLevelService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.AlertAction" id="AlertAction">
+        <property name="logService" ref="logService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.AlertManagerAction" id="AlertManagerAction">
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.config.ManagerContentFilterAction" id="ManagerContentFilterAction">
+        <property name="contentFilterService" ref="contentFilterService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.audit.AuditAction" id="AuditAction">
+        <property name="logService" ref="logService" />
+        <property name="auditService" ref="auditService"/>
+        <property name="loginService" ref="loginService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.audit.AuditResetAction" id="AuditResetAction">
+        <property name="logService" ref="logService" />
+        <property name="auditResetService" ref="auditResetService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.audit.AuditCompareAction" id="AuditCompareAction">
+        <property name="logService" ref="logService" />
+        <property name="auditService" ref="auditService" />
+    </bean>
+    <bean class="com.hzih.stp.web.action.jdbc.JdbcAction" id="JdbcAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.security.SecurityAction" id="SecurityAction">
+        <property name="logService" ref="logService"/>
+        <property name="securityService" ref="securityService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.AppTypeAction" id="AppTypeAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.ProxyAction" id="ProxyAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="deleteStatusService" ref="deleteStatusService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.FileTypeAction" id="FileTypeAction">
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="deleteStatusService" ref="deleteStatusService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.DBTypeAction" id="DBTypeAction">
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="deleteStatusService" ref="deleteStatusService"/>
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.DBSourceTableAction" id="DBSourceTableAction">
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.app.DBTargetTableAction" id="DBTargetTableAction">
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.appauth.ConfigSendAction" id="ConfigSendAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="dataBaseService" ref="dataBaseService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.appauth.ProxyIpMacAction" id="ProxyIpMacAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.appauth.ProxyIpAllowAction" id="ProxyIpAllowAction">
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="logService" ref="logService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.appauth.AuthAction" id="AuthAction">
+        <property name="deleteStatusService" ref="deleteStatusService"/>
+        <property name="logService" ref="logService"/>
+        <property name="xmlOperatorService" ref="xmlOperatorService"/>
+        <property name="dataBaseService" ref="dataBaseService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.appauth.TypeCheckAction" id="TypeCheckAction">
+        <property name="logService" ref="logService"/>
+        <property name="typeCheckService" ref="typeCheckService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.monitor.MonitorAction" id="MonitorAction">
+        <property name="logService" ref="logService"/>
+        <property name="monitorService" ref="monitorService"/>
+    </bean>
+    <bean class="com.hzih.stp.web.action.monitor.EquipmentAlertAction" id="EquipmentAlertAction">
+        <property name="logService" ref="logService"/>
+        <property name="equipmentAlertService" ref="equipmentAlertService"/>
+    </bean>
+</beans>

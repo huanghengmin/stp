@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+<session-factory>
+	<property name="c3p0.min_size">5</property>
+	<property name="c3p0.max_size">100</property>
+    <property name="c3p0.timeout">1800</property>
+    <property name="c3p0.max_statements">100</property>
+    <!--<property name="c3p0.poolPreparedStatements">true</property>-->
+
+	<mapping resource="com/hzih/stp/domain/xml/Account.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/AuditReset.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/Role.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/RoleType.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/BusinessLog.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/BusinessLogHandleDB.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/BusinessLogTime.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/BusinessSecurityAlert.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/BusinessSecurityAlertType.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/ContentFilter.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/DeleteStatus.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/Department.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/Equipment.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/EquipmentAlert.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/EquipmentLog.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/EquipmentSecurityAlert.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/EquipmentType.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/Permission.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/SafeEventSecurityAlert.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/SafeEventSecurityAlertType.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/SafePolicy.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/SecurityLevel.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/SysLog.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/TypeCheck.hbm.xml" />
+	<mapping resource="com/hzih/stp/domain/xml/UserOperLog.hbm.xml" />
+</session-factory>
+</hibernate-configuration>

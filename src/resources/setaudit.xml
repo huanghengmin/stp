@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<audit>
+    <businessaudit logtime=''>
+        <name></name>
+        <desc></desc>
+        <type></type>
+        <sourceip></sourceip>
+        <sourceport></sourceport>
+        <sourcejdbc></sourcejdbc>
+        <destip></destip>
+        <destport></destport>
+        <destjdbc></destjdbc>
+        <count></count>
+    </businessaudit>
+</audit>

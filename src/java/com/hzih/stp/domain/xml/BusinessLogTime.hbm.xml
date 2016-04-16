@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="business_log_time" name="com.hzih.stp.domain.BusinessLogTime">
+    <id access="field" name="appName" type="java.lang.String" column="appName">
+      <generator class="assigned"/>
+    </id>
+    <property name="average" column="average" access="field" type="java.lang.Double"/>
+    <property name="count" column="count" access="field" type="java.lang.Integer"/>
+  </class>
+</hibernate-mapping>

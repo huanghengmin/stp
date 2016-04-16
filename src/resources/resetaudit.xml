@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<audit>
+    <auditreset importtime='12345678998'>
+        <name>test_1</name>
+        <type>file</type>
+        <file>/usr/data/2.txt</file>
+    </auditreset>
+    <auditreset importtime='12345678999'>
+        <name>test_2</name>
+        <type>file</type>
+        <file>/usr/data/2.txt</file>
+    </auditreset>
+</audit>

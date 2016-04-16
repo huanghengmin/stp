@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<mailconfig>
+		<server>smtp.sina.com</server>
+		<port>25</port>
+		<email>andyhero168@sina.com</email>
+		<account>andyhero168@sina.com</account>
+		<password>8701271314520</password>
+		<title>单向隔离光闸</title>
+		<mailfrequency>10</mailfrequency>
+	</mailconfig>
+	<smsconfig>
+		<smsnumber>1006202102010</smsnumber>
+		<smstitle>单向隔离光闸</smstitle>
+		<smsfrequency>10</smsfrequency>
+	</smsconfig>
+</config>

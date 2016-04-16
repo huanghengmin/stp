@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration desc="">
+  <system> 
+    <ichange> 
+      <privatekey>security/server</privatekey>  
+      <privatepassword>inetec</privatepassword>  
+      <jdbcs/>  
+      <types/>  
+      <stp> 
+        <channel value="1"> 
+          <privated>true</privated>  
+          <ip>1.1.1.2</ip>  
+          <port>6666</port>  
+          <tip>1.1.1.1</tip>  
+          <tport>6666</tport>  
+          <protocol>stp</protocol>  
+          <auditport>6667</auditport>  
+          <count>5000</count>  
+          <size>1</size> 
+        </channel>
+      </stp>  
+      <ichangeutils> 
+        <gcinterval>10</gcinterval>  
+        <recover>10</recover>  
+        <systemmeantime>300</systemmeantime>  
+        <logserverport>8090</logserverport>  
+        <virusscan>/usr/app/ichange/data</virusscan>  
+        <restarttime/>  
+        <logserveruser/>  
+        <logserverpassword/>  
+        <logsmaxsize>2</logsmaxsize>  
+        <logsmaxday>1</logsmaxday>  
+        <snmpclientset/>  
+        <syslogclientset/> 
+      </ichangeutils> 
+    </ichange> 
+  </system> 
+</configuration>

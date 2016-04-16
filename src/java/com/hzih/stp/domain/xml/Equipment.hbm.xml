@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class table="equipment" name="com.hzih.stp.domain.Equipment">
+    <id access="field" name="id" type="java.lang.Long" column="Id">
+      <generator class="identity"/>
+    </id>
+      <property name="equipmentName" column="equipment_name" access="field" type="java.lang.String"/>
+      <property name="equipmentDesc" column="equipment_desc" access="field" type="java.lang.String"/>
+      <property name="equTypeCode" column="equipment_type_code" access="field" type="java.lang.String"/>
+      <property name="equSysConfig" column="equipment_sys_config" access="field" type="java.lang.String"/>
+      <property name="equManagerDepart" column="equipment_manager_depart" access="field" type="java.lang.String"/>
+      <property name="monitorUsed" column="monitor_used" access="field" type="java.lang.String"/>
+      <property name="keyDevice" column="key_device" access="field" type="java.lang.String"/>
+      <property name="ip" column="ip" access="field" type="java.lang.String"/>
+      <property name="otherIp" column="other_ip" access="field" type="java.lang.String"/>
+      <property name="mac" column="mac" access="field" type="java.lang.String"/>
+      <property name="subNetMask" column="sub_net_mask" access="field" type="java.lang.String"/>
+      <property name="linkType" column="link_type" access="field" type="java.lang.String"/>
+      <property name="linkName" column="link_name" access="field" type="java.lang.String"/>
+      <property name="port" column="port" access="field" type="java.lang.String"/>
+      <property name="password" column="password" access="field" type="java.lang.String"/>
+      <property name="oidName" column="oidname" access="field" type="java.lang.String"/>
+      <property name="snmpVer" column="snmpver" access="field" type="java.lang.String"/>
+      <property name="auth" column="auth" access="field" type="java.lang.String"/>
+      <property name="authPassword" column="authpassword" access="field" type="java.lang.String"/>
+      <property name="common" column="common" access="field" type="java.lang.String"/>
+      <property name="commonPassword" column="commonpassword" access="field" type="java.lang.String"/>
+  </class>
+</hibernate-mapping>
